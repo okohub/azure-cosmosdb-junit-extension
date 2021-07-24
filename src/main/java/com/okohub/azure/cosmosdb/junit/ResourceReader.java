@@ -17,11 +17,11 @@ import static java.util.stream.Collectors.joining;
 /**
  * @author onurozcan
  */
-public class ResourceReader {
+final class ResourceReader {
 
   private final static ObjectMapper MAPPER = new ObjectMapper();
 
-  public Optional<String> readResource(String resourcePath) {
+  Optional<String> readResource(String resourcePath) {
     InputStream resource = getClass().getResourceAsStream(resourcePath);
     if (Objects.isNull(resource)) {
       return Optional.empty();
@@ -31,7 +31,7 @@ public class ResourceReader {
     return Optional.of(scriptData);
   }
 
-  public Stream<JsonNode> readResourceContentAsJsonStream(String resourceContent) throws JsonProcessingException {
+  Stream<JsonNode> readResourceContentAsJsonStream(String resourceContent) throws JsonProcessingException {
     JsonNode jsonNode = MAPPER.readTree(resourceContent);
     Iterable<JsonNode> iterable = jsonNode::elements;
     return StreamSupport.stream(iterable.spliterator(), false);

@@ -24,7 +24,7 @@ import static com.azure.cosmos.implementation.batch.BatchRequestResponseConstant
 /**
  * @author onurozcan
  */
-public class ResourceOperator {
+final class ResourceOperator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ResourceOperator.class);
 
@@ -34,18 +34,18 @@ public class ResourceOperator {
 
   private final CosmosScript annotation;
 
-  public ResourceOperator(CosmosAsyncClient cosmosClient, CosmosScript annotation) {
+  ResourceOperator(CosmosAsyncClient cosmosClient, CosmosScript annotation) {
     this.resourceReader = new ResourceReader();
     this.cosmosClient = cosmosClient;
     this.annotation = annotation;
   }
 
-  public void createDatabase() {
+  void createDatabase() {
     String database = annotation.database();
     cosmosClient.createDatabaseIfNotExists(database).block();
   }
 
-  public void createContainer() {
+  void createContainer() {
     String database = annotation.database();
     String container = annotation.container();
     cosmosClient.getDatabase(database)
@@ -54,12 +54,12 @@ public class ResourceOperator {
                 .block();
   }
 
-  public void deleteDatabase() {
+  void deleteDatabase() {
     String database = annotation.database();
     cosmosClient.getDatabase(database).delete().block();
   }
 
-  public void populate() throws Exception {
+  void populate() throws Exception {
     Optional<String> scriptContentContainer = resourceReader.readResource(annotation.script());
     if (scriptContentContainer.isEmpty()) {
       return;

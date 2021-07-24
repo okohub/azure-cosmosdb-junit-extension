@@ -12,11 +12,11 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 /**
  * @author onurozcan
  */
-public class AsyncCosmosScriptExtension extends AbstractCosmosScriptExtension {
+public class AsyncClientCosmosScriptExtension extends AbstractCosmosScriptExtension {
 
   private final CosmosAsyncClient cosmosClient;
 
-  public AsyncCosmosScriptExtension(String endpoint, String key) {
+  public AsyncClientCosmosScriptExtension(String endpoint, String key) {
     GatewayConnectionConfig config = hackedGatewayConfig();
     this.cosmosClient = new CosmosClientBuilder().gatewayMode(config)
                                                  .endpointDiscoveryEnabled(false)
@@ -25,13 +25,17 @@ public class AsyncCosmosScriptExtension extends AbstractCosmosScriptExtension {
                                                  .buildAsyncClient();
   }
 
+  public AsyncClientCosmosScriptExtension(CosmosAsyncClient client) {
+    this.cosmosClient = client;
+  }
+
   /**
    * for large documents, 5 seconds sometimes not enough.
    * However, requestTimeout setter in config is hidden for an unknown reason (still looking for why)
    * So a bit hacky thing to make it double
    *
-   * @link {https://github.com/Azure/azure-sdk-for-java/pull/11702}
    * @return customized GatewayConnectionConfig
+   * @link {https://github.com/Azure/azure-sdk-for-java/pull/11702}
    */
   private GatewayConnectionConfig hackedGatewayConfig() {
     GatewayConnectionConfig config = new GatewayConnectionConfig();

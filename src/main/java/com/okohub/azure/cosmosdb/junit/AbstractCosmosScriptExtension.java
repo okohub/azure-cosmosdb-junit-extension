@@ -9,9 +9,9 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 /**
  * @author onurozcan
  */
-public abstract class AbstractCosmosScriptExtension implements BeforeEachCallback,
-                                                               AfterEachCallback,
-                                                               ParameterResolver {
+abstract class AbstractCosmosScriptExtension implements BeforeEachCallback,
+                                                        AfterEachCallback,
+                                                        ParameterResolver {
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
@@ -23,7 +23,7 @@ public abstract class AbstractCosmosScriptExtension implements BeforeEachCallbac
     doBeforeEach(context, annotation);
   }
 
-  public abstract void doBeforeEach(ExtensionContext context, CosmosScript annotation) throws Exception;
+  abstract void doBeforeEach(ExtensionContext context, CosmosScript annotation) throws Exception;
 
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
@@ -35,7 +35,7 @@ public abstract class AbstractCosmosScriptExtension implements BeforeEachCallbac
     doAfterEach(context, annotation);
   }
 
-  public abstract void doAfterEach(ExtensionContext context, CosmosScript annotation) throws Exception;
+  abstract void doAfterEach(ExtensionContext context, CosmosScript annotation) throws Exception;
 
   private Optional<CosmosScript> getAnnotation(ExtensionContext context) {
     return context.getTestMethod().map(m -> m.getAnnotation(CosmosScript.class));

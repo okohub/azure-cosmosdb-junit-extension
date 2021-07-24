@@ -12,6 +12,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static com.okohub.azure.cosmosdb.junit.Constants.DEFAULT_CONTAINER;
+import static com.okohub.azure.cosmosdb.junit.Constants.DEFAULT_DATABASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.testcontainers.containers.CosmosDbEmulatorContainer.LINUX_AZURE_COSMOS_EMULATOR;
@@ -27,19 +29,16 @@ public class AzureContainerCosmosScripTests {
       new CosmosDbEmulatorContainer(DockerImageName.parse(LINUX_AZURE_COSMOS_EMULATOR));
 
   @RegisterExtension
-  AsyncCosmosScriptExtension cosmosScriptExtension =
-      new AsyncCosmosScriptExtension(COSMOS_EMULATOR.getEmulatorEndpoint(),
-                                     COSMOS_EMULATOR.getEmulatorLocalKey());
+  AsyncClientCosmosScriptExtension cosmosScriptExtension =
+      new AsyncClientCosmosScriptExtension(COSMOS_EMULATOR.getEmulatorEndpoint(),
+                                           COSMOS_EMULATOR.getEmulatorLocalKey());
 
-  @CosmosScript(database = "mytest",
-                container = "volcanos",
-                script = "/volcano_data.json",
-                partitionKey = "id")
+  @CosmosScript(script = "/volcano_data.json", partitionKey = "id")
   @Test
   public void shouldReadScriptFirstItemFromCosmosDb(CosmosAsyncClient client) {
     String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";
-    CosmosItemResponse<HashMap> firstItemResponse = client.getDatabase("mytest")
-                                                          .getContainer("volcanos")
+    CosmosItemResponse<HashMap> firstItemResponse = client.getDatabase(DEFAULT_DATABASE)
+                                                          .getContainer(DEFAULT_CONTAINER)
                                                           .readItem(firstItemId,
                                                                     new PartitionKey(firstItemId),
                                                                     HashMap.class)
