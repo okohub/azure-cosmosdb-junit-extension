@@ -30,6 +30,7 @@ public class AsyncCosmosScriptExtension extends AbstractCosmosScriptExtension {
    * However, requestTimeout setter in config is hidden for an unknown reason (still looking for why)
    * So a bit hacky thing to make it double
    *
+   * @link {https://github.com/Azure/azure-sdk-for-java/pull/11702}
    * @return customized GatewayConnectionConfig
    */
   private GatewayConnectionConfig hackedGatewayConfig() {
