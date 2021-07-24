@@ -2,7 +2,6 @@ package com.okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.BulkProcessingOptions;
 import com.azure.cosmos.CosmosAsyncClient;
-import com.azure.cosmos.CosmosAsyncDatabase;
 import com.azure.cosmos.CosmosItemOperation;
 import com.azure.cosmos.models.PartitionKey;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,12 +9,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import reactor.core.publisher.Flux;
 
 import static com.azure.cosmos.BulkOperations.getCreateItemOperation;
+import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.joining;
 
 /**
  * @author onurozcan
@@ -28,62 +30,61 @@ public class ResourceOperator {
 
   private final CosmosScript annotation;
 
-  //
-
-  private CosmosAsyncDatabase database;
-
   public ResourceOperator(CosmosAsyncClient cosmosClient, CosmosScript annotation) {
     this.cosmosClient = cosmosClient;
     this.annotation = annotation;
   }
 
-  public ResourceOperator createDatabase() {
+  public void createDatabase() {
     String database = annotation.database();
     cosmosClient.createDatabaseIfNotExists(database).block();
-    this.database = cosmosClient.getDatabase(database);
-    return this;
   }
 
-  public ResourceOperator deleteDatabase() {
+  public void createContainer() {
+    String database = annotation.database();
+    String container = annotation.container();
+    cosmosClient.getDatabase(database)
+                .createContainerIfNotExists(container,
+                                            "/" + annotation.partitionKey())
+                .block();
+  }
+
+  public void deleteDatabase() {
     String database = annotation.database();
     cosmosClient.getDatabase(database).delete().block();
-    return this;
   }
 
-  public ResourceOperator createContainer() {
-    String container = annotation.container();
-    database.createContainerIfNotExists(container, "/" + annotation.partitionKey()).block();
-    return this;
-  }
-
-  public ResourceOperator populate(Integer itemCount) {
-    try {
-      String data = readScript(annotation.script());
-      JsonNode jsonNode = MAPPER.readTree(data);
-      Iterable<JsonNode> iterable = jsonNode::elements;
-      Stream<JsonNode> targetStream = StreamSupport.stream(iterable.spliterator(), false);
-      Stream<CosmosItemOperation> operationStream =
-          targetStream.limit(itemCount)
-                      .map(node -> {
-                        String key = node.findPath(annotation.partitionKey()).textValue();
-                        PartitionKey partitionKey = new PartitionKey(key);
-                        return getCreateItemOperation(node, partitionKey);
-                      });
-      Flux<CosmosItemOperation> operationFlux = Flux.fromStream(operationStream);
-      BulkProcessingOptions bulkOptions = new BulkProcessingOptions();
-      bulkOptions.setMaxMicroBatchSize(itemCount + 1);
-      database.getContainer(annotation.container())
-              .processBulkOperations(operationFlux, bulkOptions)
-              .blockLast();
-      return this;
-    } catch (Exception ex) {
-      throw new IllegalStateException(ex);
+  public void populate(Integer itemCount) throws Exception {
+    Optional<String> scriptContentContainer = readScript(annotation.script());
+    if (scriptContentContainer.isEmpty()) {
+      return;
     }
+    String scriptContent = scriptContentContainer.get();
+    JsonNode jsonNode = MAPPER.readTree(scriptContent);
+    Iterable<JsonNode> iterable = jsonNode::elements;
+    Stream<JsonNode> targetStream = StreamSupport.stream(iterable.spliterator(), false);
+    Stream<CosmosItemOperation> operationStream = targetStream.limit(itemCount)
+                                                              .map(node -> {
+                                                                String key = node.findPath(annotation.partitionKey())
+                                                                                 .textValue();
+                                                                PartitionKey partitionKey = new PartitionKey(key);
+                                                                return getCreateItemOperation(node, partitionKey);
+                                                              });
+    BulkProcessingOptions bulkOptions = new BulkProcessingOptions();
+    bulkOptions.setMaxMicroBatchSize(itemCount + 1);
+    cosmosClient.getDatabase(annotation.database())
+                .getContainer(annotation.container())
+                .processBulkOperations(Flux.fromStream(operationStream), bulkOptions)
+                .blockLast();
   }
 
-  private String readScript(String resourcePath) {
+  private Optional<String> readScript(String resourcePath) {
     InputStream resource = getClass().getResourceAsStream(resourcePath);
+    if (Objects.isNull(resource)) {
+      return Optional.empty();
+    }
     BufferedReader reader = new BufferedReader(new InputStreamReader(resource));
-    return reader.lines().collect(Collectors.joining(System.getProperty("line.separator")));
+    String scriptData = reader.lines().collect(joining(lineSeparator()));
+    return Optional.of(scriptData);
   }
 }

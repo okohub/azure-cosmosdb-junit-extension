@@ -16,13 +16,15 @@ public class AsyncCosmosScriptExtension extends AbstractCosmosScriptExtension {
 
   @Override
   public void doBeforeEach(ExtensionContext context, CosmosScript annotation) throws Exception {
-    new ResourceOperator(cosmosClient, annotation).createDatabase()
-                                                  .createContainer()
-                                                  .populate(50);
+    ResourceOperator resourceOperator = new ResourceOperator(cosmosClient, annotation);
+    resourceOperator.createDatabase();
+    resourceOperator.createContainer();
+    resourceOperator.populate(50);
   }
 
   @Override
   public void doAfterEach(ExtensionContext context, CosmosScript annotation) throws Exception {
-    new ResourceOperator(cosmosClient, annotation).deleteDatabase();
+    ResourceOperator resourceOperator = new ResourceOperator(cosmosClient, annotation);
+    resourceOperator.deleteDatabase();
   }
 }

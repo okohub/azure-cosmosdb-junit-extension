@@ -14,9 +14,9 @@ import java.lang.annotation.Target;
 @Documented
 public @interface CosmosScript {
 
-  String database();
+  String database() default Constants.DEFAULT_DATABASE;
 
-  String container();
+  String container() default Constants.DEFAULT_CONTAINER;
 
   String script();
 

@@ -2,6 +2,7 @@ package com.okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosClientBuilder;
+import com.azure.cosmos.CosmosException;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.testcontainers.containers.CosmosDbEmulatorContainer.LINUX_AZURE_COSMOS_EMULATOR;
 
 /**
@@ -40,19 +42,29 @@ public class AzureContainerCosmosScripTests {
                 partitionKey = "id")
   @Test
   public void shouldReadScriptFirstItemFromCosmosDb() {
-    CosmosItemResponse<HashMap> response = client.getDatabase("mytest")
-                                                 .getContainer("volcanos")
-                                                 .readItem("4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766",
-                                                           new PartitionKey("4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766"),
-                                                           HashMap.class)
-                                                 .block();
-    assertThat(response.getStatusCode()).isEqualTo(200);
-    HashMap item = response.getItem();
-    assertThat(item).hasSize(14);
+    String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";
+    CosmosItemResponse<HashMap> firstItemResponse = client.getDatabase("mytest")
+                                                          .getContainer("volcanos")
+                                                          .readItem(firstItemId,
+                                                                    new PartitionKey(firstItemId),
+                                                                    HashMap.class)
+                                                          .block();
+    assertThat(firstItemResponse.getStatusCode()).isEqualTo(200);
+    HashMap firstItem = firstItemResponse.getItem();
+    assertThat(firstItem).hasSize(14);
+    assertThat(firstItem).containsEntry("id", firstItemId);
   }
 
   @Test
-  public void shouldDoNothing() {
-    System.out.println("nothing");
+  public void shouldNotReadScriptFirstItemFromCosmosDbBecauseOfNonexistence() {
+    assertThrows(CosmosException.class, () -> {
+      String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";
+      client.getDatabase("mytest")
+            .getContainer("volcanos")
+            .readItem(firstItemId,
+                      new PartitionKey(firstItemId),
+                      HashMap.class)
+            .block();
+    });
   }
 }
