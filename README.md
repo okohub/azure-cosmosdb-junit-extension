@@ -30,3 +30,6 @@ public class MyAwesomeTests {
 - Supported loading data from resources or absolute path.
 - Use autoconfigured cool CosmosAsyncClient by injecting to test method. Neat!
 - `@CosmosScript` annotation has sensible defaults, so you don't need to provide every detail. Just test your code!
+
+## License
+Azure CosmosDb Junit Extension is licensed under the [MIT](/LICENSE.md) license.
