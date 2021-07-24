@@ -18,8 +18,19 @@ public @interface CosmosScript {
 
   String container() default Constants.DEFAULT_CONTAINER;
 
+  /**
+   * If script path starts with "/", will be resolved from direct path
+   * If script path not starts with "/", will be resolved from resources
+   *
+   * @return path of script
+   */
   String script();
 
+  /**
+   * this parameter cannot be bigger than Azure defaults
+   *
+   * @see com.azure.cosmos.implementation.batch.BatchRequestResponseConstants#MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST
+   */
   int chunkSize() default Constants.DEFAULT_CHUNK_SIZE;
 
   String partitionKey();

@@ -1,6 +1,7 @@
 package com.okohub.azure.cosmosdb.junit;
 
 import com.azure.core.util.Context;
+import com.azure.cosmos.BulkOperations;
 import com.azure.cosmos.BulkProcessingOptions;
 import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosAsyncContainer;
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static com.azure.cosmos.BulkOperations.getCreateItemOperation;
 import static com.azure.cosmos.implementation.batch.BatchRequestResponseConstants.MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST;
 
 /**
@@ -49,8 +49,7 @@ final class ResourceOperator {
     String database = annotation.database();
     String container = annotation.container();
     cosmosClient.getDatabase(database)
-                .createContainerIfNotExists(container,
-                                            "/" + annotation.partitionKey())
+                .createContainerIfNotExists(container, "/" + annotation.partitionKey())
                 .block();
   }
 
@@ -60,48 +59,51 @@ final class ResourceOperator {
   }
 
   void populate() throws Exception {
-    Optional<String> scriptContentContainer = resourceReader.readResource(annotation.script());
+    String script = annotation.script();
+    Optional<String> scriptContentContainer = resourceReader.readResource(script);
     if (scriptContentContainer.isEmpty()) {
+      LOGGER.error("Can not populate because resource is not found. Script: {}", script);
       return;
     }
-    //
     CosmosAsyncContainer container = cosmosClient.getDatabase(annotation.database())
                                                  .getContainer(annotation.container());
-    //
     Stream<JsonNode> targetStream = resourceReader.readResourceContentAsJsonStream(scriptContentContainer.get());
     //
-    Double totalRequestCharge = Flux.fromStream(targetStream)
-                                    .buffer(Math.min(annotation.chunkSize(),
-                                                     MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST))
-                                    .flatMap(jsonNodes -> newBulkOperation(container, jsonNodes))
-                                    .flatMap(response -> {
-                                      if (Objects.nonNull(response.getException())) {
-                                        LOGGER.error("Problem on single chunk.", response.getException());
-                                        return Mono.just(0.0);
-                                      }
-                                      CosmosBulkItemResponse itemResponse = response.getResponse();
-                                      LOGGER.info("Finished single chunk. Status: {}, Millis: {}",
-                                                  itemResponse.getStatusCode(),
-                                                  itemResponse.getDuration().toMillis());
-                                      return Mono.just(itemResponse.getRequestCharge());
-                                    })
-                                    .reduce(Double::sum)
-                                    .block();
-    LOGGER.info("Finished script load. Total request charge in Azure Terms: {}", totalRequestCharge);
+    Double totalRequestCharge = doPopulate(container, targetStream);
+    LOGGER.info("Finished data population. Total request charge in Azure Terms: {}", totalRequestCharge);
+  }
+
+  private Double doPopulate(CosmosAsyncContainer container, Stream<JsonNode> targetStream) {
+    return Flux.fromStream(targetStream)
+               .buffer(Math.min(annotation.chunkSize(), MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST))
+               .flatMap(jsonNodes -> newBulkOperation(container, jsonNodes))
+               .flatMap(response -> {
+                 if (Objects.nonNull(response.getException())) {
+                   LOGGER.error("Problem on single chunk.", response.getException());
+                   return Mono.just(0.0);
+                 }
+                 CosmosBulkItemResponse itemResponse = response.getResponse();
+                 LOGGER.info("Finished single chunk. Status: {}, Millis: {}",
+                             itemResponse.getStatusCode(),
+                             itemResponse.getDuration().toMillis());
+                 return Mono.just(itemResponse.getRequestCharge());
+               })
+               .reduce(Double::sum)
+               .block();
   }
 
   private Flux<CosmosBulkOperationResponse<Context>> newBulkOperation(CosmosAsyncContainer container,
                                                                       List<JsonNode> jsonNodes) {
-    var operationArray = jsonNodes.stream()
-                                  .map(this::newBulkItemOperation)
-                                  .toArray(CosmosItemOperation[]::new);
     LOGGER.info("Creating new chunk for bulk operation. Size: {}", jsonNodes.size());
-    return container.processBulkOperations(Flux.fromArray(operationArray), new BulkProcessingOptions<>(Context.NONE));
+    return container.processBulkOperations(Flux.fromArray(jsonNodes.stream()
+                                                                   .map(this::newBulkItemOperation)
+                                                                   .toArray(CosmosItemOperation[]::new)),
+                                           new BulkProcessingOptions<>(Context.NONE));
   }
 
   private CosmosItemOperation newBulkItemOperation(JsonNode jn) {
     String key = jn.findPath(annotation.partitionKey()).textValue();
     PartitionKey partitionKey = new PartitionKey(key);
-    return getCreateItemOperation(jn, partitionKey);
+    return BulkOperations.getCreateItemOperation(jn, partitionKey);
   }
 }

@@ -33,7 +33,7 @@ public class AzureContainerCosmosScripTests {
       new AsyncClientCosmosScriptExtension(COSMOS_EMULATOR.getEmulatorEndpoint(),
                                            COSMOS_EMULATOR.getEmulatorLocalKey());
 
-  @CosmosScript(script = "/volcano_data.json", partitionKey = "id")
+  @CosmosScript(script = "volcano_data.json", partitionKey = "id")
   @Test
   public void shouldReadScriptFirstItemFromCosmosDb(CosmosAsyncClient client) {
     String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";

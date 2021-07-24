@@ -16,6 +16,10 @@ public class AsyncClientCosmosScriptExtension extends AbstractCosmosScriptExtens
 
   private final CosmosAsyncClient cosmosClient;
 
+  public AsyncClientCosmosScriptExtension(CosmosAsyncClient client) {
+    this.cosmosClient = client;
+  }
+
   public AsyncClientCosmosScriptExtension(String endpoint, String key) {
     GatewayConnectionConfig config = hackedGatewayConfig();
     this.cosmosClient = new CosmosClientBuilder().gatewayMode(config)
@@ -23,10 +27,6 @@ public class AsyncClientCosmosScriptExtension extends AbstractCosmosScriptExtens
                                                  .endpoint(endpoint)
                                                  .key(key)
                                                  .buildAsyncClient();
-  }
-
-  public AsyncClientCosmosScriptExtension(CosmosAsyncClient client) {
-    this.cosmosClient = client;
   }
 
   /**
