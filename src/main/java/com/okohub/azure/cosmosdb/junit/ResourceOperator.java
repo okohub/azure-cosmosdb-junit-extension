@@ -1,36 +1,39 @@
 package com.okohub.azure.cosmosdb.junit;
 
+import com.azure.core.util.Context;
 import com.azure.cosmos.BulkProcessingOptions;
 import com.azure.cosmos.CosmosAsyncClient;
+import com.azure.cosmos.CosmosAsyncContainer;
+import com.azure.cosmos.CosmosBulkItemResponse;
+import com.azure.cosmos.CosmosBulkOperationResponse;
 import com.azure.cosmos.CosmosItemOperation;
 import com.azure.cosmos.models.PartitionKey;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import static com.azure.cosmos.BulkOperations.getCreateItemOperation;
-import static java.lang.System.lineSeparator;
-import static java.util.stream.Collectors.joining;
 
 /**
  * @author onurozcan
  */
 public class ResourceOperator {
 
-  private final static ObjectMapper MAPPER = new ObjectMapper();
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResourceOperator.class);
+
+  private final ResourceReader resourceReader;
 
   private final CosmosAsyncClient cosmosClient;
 
   private final CosmosScript annotation;
 
   public ResourceOperator(CosmosAsyncClient cosmosClient, CosmosScript annotation) {
+    this.resourceReader = new ResourceReader();
     this.cosmosClient = cosmosClient;
     this.annotation = annotation;
   }
@@ -54,37 +57,43 @@ public class ResourceOperator {
     cosmosClient.getDatabase(database).delete().block();
   }
 
-  public void populate(Integer itemCount) throws Exception {
-    Optional<String> scriptContentContainer = readScript(annotation.script());
+  public void populate() throws Exception {
+    Optional<String> scriptContentContainer = resourceReader.readResource(annotation.script());
     if (scriptContentContainer.isEmpty()) {
       return;
     }
-    String scriptContent = scriptContentContainer.get();
-    JsonNode jsonNode = MAPPER.readTree(scriptContent);
-    Iterable<JsonNode> iterable = jsonNode::elements;
-    Stream<JsonNode> targetStream = StreamSupport.stream(iterable.spliterator(), false);
-    Stream<CosmosItemOperation> operationStream = targetStream.limit(itemCount)
-                                                              .map(node -> {
-                                                                String key = node.findPath(annotation.partitionKey())
-                                                                                 .textValue();
-                                                                PartitionKey partitionKey = new PartitionKey(key);
-                                                                return getCreateItemOperation(node, partitionKey);
-                                                              });
-    BulkProcessingOptions bulkOptions = new BulkProcessingOptions();
-    bulkOptions.setMaxMicroBatchSize(itemCount + 1);
-    cosmosClient.getDatabase(annotation.database())
-                .getContainer(annotation.container())
-                .processBulkOperations(Flux.fromStream(operationStream), bulkOptions)
-                .blockLast();
+    //
+    CosmosAsyncContainer container = cosmosClient.getDatabase(annotation.database())
+                                                 .getContainer(annotation.container());
+    //
+    Stream<JsonNode> targetStream = resourceReader.readResourceContentAsJsonStream(scriptContentContainer.get());
+    //
+    Double totalRequestCharge = Flux.fromStream(targetStream)
+                                    .buffer(annotation.chunkSize())
+                                    .flatMap(jsonNodes -> newBulkOperation(container, jsonNodes))
+                                    .flatMap(response -> {
+                                      CosmosBulkItemResponse itemResponse = response.getResponse();
+                                      LOGGER.debug("Finished single chunk. Status: {}, Millis: {}",
+                                                   itemResponse.getStatusCode(),
+                                                   itemResponse.getDuration().toMillis());
+                                      return Mono.just(itemResponse.getRequestCharge());
+                                    })
+                                    .reduce(Double::sum)
+                                    .block();
+    LOGGER.info("Finished script load. Total request charge in Azure Terms: {}", totalRequestCharge);
   }
 
-  private Optional<String> readScript(String resourcePath) {
-    InputStream resource = getClass().getResourceAsStream(resourcePath);
-    if (Objects.isNull(resource)) {
-      return Optional.empty();
-    }
-    BufferedReader reader = new BufferedReader(new InputStreamReader(resource));
-    String scriptData = reader.lines().collect(joining(lineSeparator()));
-    return Optional.of(scriptData);
+  private Flux<CosmosBulkOperationResponse<Context>> newBulkOperation(CosmosAsyncContainer container,
+                                                                      List<JsonNode> jsonNodes) {
+    var operationArray = jsonNodes.stream()
+                                  .map(this::newBulkItemOperation)
+                                  .toArray(CosmosItemOperation[]::new);
+    return container.processBulkOperations(Flux.fromArray(operationArray), new BulkProcessingOptions<>(Context.NONE));
+  }
+
+  private CosmosItemOperation newBulkItemOperation(JsonNode jn) {
+    String key = jn.findPath(annotation.partitionKey()).textValue();
+    PartitionKey partitionKey = new PartitionKey(key);
+    return getCreateItemOperation(jn, partitionKey);
   }
 }

@@ -20,5 +20,7 @@ public @interface CosmosScript {
 
   String script();
 
+  int chunkSize() default Constants.DEFAULT_CHUNK_SIZE;
+
   String partitionKey();
 }

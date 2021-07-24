@@ -19,7 +19,7 @@ public class AsyncCosmosScriptExtension extends AbstractCosmosScriptExtension {
     ResourceOperator resourceOperator = new ResourceOperator(cosmosClient, annotation);
     resourceOperator.createDatabase();
     resourceOperator.createContainer();
-    resourceOperator.populate(50);
+    resourceOperator.populate();
   }
 
   @Override
