@@ -10,6 +10,7 @@ import com.azure.cosmos.CosmosItemOperation;
 import com.azure.cosmos.models.PartitionKey;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static com.azure.cosmos.BulkOperations.getCreateItemOperation;
+import static com.azure.cosmos.implementation.batch.BatchRequestResponseConstants.MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST;
 
 /**
  * @author onurozcan
@@ -69,13 +71,18 @@ public class ResourceOperator {
     Stream<JsonNode> targetStream = resourceReader.readResourceContentAsJsonStream(scriptContentContainer.get());
     //
     Double totalRequestCharge = Flux.fromStream(targetStream)
-                                    .buffer(annotation.chunkSize())
+                                    .buffer(Math.min(annotation.chunkSize(),
+                                                     MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST))
                                     .flatMap(jsonNodes -> newBulkOperation(container, jsonNodes))
                                     .flatMap(response -> {
+                                      if (Objects.nonNull(response.getException())) {
+                                        LOGGER.error("Problem on single chunk.", response.getException());
+                                        return Mono.just(0.0);
+                                      }
                                       CosmosBulkItemResponse itemResponse = response.getResponse();
-                                      LOGGER.debug("Finished single chunk. Status: {}, Millis: {}",
-                                                   itemResponse.getStatusCode(),
-                                                   itemResponse.getDuration().toMillis());
+                                      LOGGER.info("Finished single chunk. Status: {}, Millis: {}",
+                                                  itemResponse.getStatusCode(),
+                                                  itemResponse.getDuration().toMillis());
                                       return Mono.just(itemResponse.getRequestCharge());
                                     })
                                     .reduce(Double::sum)
@@ -88,6 +95,7 @@ public class ResourceOperator {
     var operationArray = jsonNodes.stream()
                                   .map(this::newBulkItemOperation)
                                   .toArray(CosmosItemOperation[]::new);
+    LOGGER.info("Creating new chunk for bulk operation. Size: {}", jsonNodes.size());
     return container.processBulkOperations(Flux.fromArray(operationArray), new BulkProcessingOptions<>(Context.NONE));
   }
 

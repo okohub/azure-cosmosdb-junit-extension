@@ -9,5 +9,5 @@ final class Constants {
 
   static final String DEFAULT_CONTAINER = "COSMOS_DB_EMULATOR_CONTAINER";
 
-  static final int DEFAULT_CHUNK_SIZE = 40;
+  static final int DEFAULT_CHUNK_SIZE = 50;
 }

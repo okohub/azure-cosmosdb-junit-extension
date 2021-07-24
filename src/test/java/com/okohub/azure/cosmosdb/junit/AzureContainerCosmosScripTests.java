@@ -1,7 +1,6 @@
 package com.okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.CosmosAsyncClient;
-import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosException;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
@@ -27,21 +26,17 @@ public class AzureContainerCosmosScripTests {
   private static final CosmosDbEmulatorContainer COSMOS_EMULATOR =
       new CosmosDbEmulatorContainer(DockerImageName.parse(LINUX_AZURE_COSMOS_EMULATOR));
 
-  private final CosmosAsyncClient client = new CosmosClientBuilder().gatewayMode()
-                                                                    .endpointDiscoveryEnabled(false)
-                                                                    .endpoint(COSMOS_EMULATOR.getEmulatorEndpoint())
-                                                                    .key(COSMOS_EMULATOR.getEmulatorLocalKey())
-                                                                    .buildAsyncClient();
-
   @RegisterExtension
-  AsyncCosmosScriptExtension cosmosScriptExtension = new AsyncCosmosScriptExtension(client);
+  AsyncCosmosScriptExtension cosmosScriptExtension =
+      new AsyncCosmosScriptExtension(COSMOS_EMULATOR.getEmulatorEndpoint(),
+                                     COSMOS_EMULATOR.getEmulatorLocalKey());
 
   @CosmosScript(database = "mytest",
                 container = "volcanos",
                 script = "/volcano_data.json",
                 partitionKey = "id")
   @Test
-  public void shouldReadScriptFirstItemFromCosmosDb() {
+  public void shouldReadScriptFirstItemFromCosmosDb(CosmosAsyncClient client) {
     String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";
     CosmosItemResponse<HashMap> firstItemResponse = client.getDatabase("mytest")
                                                           .getContainer("volcanos")
@@ -56,7 +51,7 @@ public class AzureContainerCosmosScripTests {
   }
 
   @Test
-  public void shouldNotReadScriptFirstItemFromCosmosDbBecauseOfNonexistence() {
+  public void shouldNotReadScriptFirstItemFromCosmosDbBecauseOfNonexistence(CosmosAsyncClient client) {
     assertThrows(CosmosException.class, () -> {
       String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";
       client.getDatabase("mytest")
