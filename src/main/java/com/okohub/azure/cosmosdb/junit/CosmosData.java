@@ -27,15 +27,15 @@ public @interface CosmosData {
 
   String container() default Constants.DEFAULT_CONTAINER;
 
-  boolean useBulk() default false;
-
   /**
    * currently supported for:
    * CREATE (default)
    * REPLACE
    * UPSERT
    */
-  CosmosItemOperationType bulkOperationType() default CosmosItemOperationType.CREATE;
+  CosmosItemOperationType operationType() default CosmosItemOperationType.CREATE;
+
+  boolean useBulk() default false;
 
   /**
    * this parameter cannot be bigger than Azure defaults

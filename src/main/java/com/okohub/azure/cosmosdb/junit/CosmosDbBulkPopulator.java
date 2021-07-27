@@ -38,7 +38,7 @@ final class CosmosDbBulkPopulator implements CosmosDbPopulator {
   public Double populate(CosmosAsyncContainer container, Stream<JsonNode> targetStream) {
     return Flux.fromStream(targetStream)
                .buffer(Math.min(annotation.bulkChunkSize(), MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST))
-               .flatMap(jsonNodes -> newBulkOperation(container, jsonNodes, annotation.bulkOperationType()))
+               .flatMap(jsonNodes -> newBulkOperation(container, jsonNodes, annotation.operationType()))
                .flatMap(response -> {
                  if (Objects.nonNull(response.getException())) {
                    LOGGER.error("Problem on single chunk.", response.getException());
