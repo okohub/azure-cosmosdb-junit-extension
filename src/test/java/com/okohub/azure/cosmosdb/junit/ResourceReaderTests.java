@@ -13,7 +13,7 @@ public class ResourceReaderTests {
   @Test
   public void shouldFindResourceByResources() {
     ResourceReader resourceReader = new ResourceReader();
-    Optional<String> dataContainer = resourceReader.readResource("volcano_data.json");
+    Optional<String> dataContainer = resourceReader.readResource("volcano_data_small.json");
     Assertions.assertThat(dataContainer).isNotEmpty();
   }
 

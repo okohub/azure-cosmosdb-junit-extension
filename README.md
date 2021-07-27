@@ -37,6 +37,7 @@ public class MyAwesomeTests {
 - Supported data loading from resources or absolute path.
 - Use autoconfigured cool CosmosAsyncClient by injecting to test method. Neat!
 - `@CosmosData` annotation has sensible defaults, so you don't need to provide every detail. Just test your code!
+- Optional testcontainers abstraction for tests, but you need to provide necessary dependencies.
 
 ## License
 Azure CosmosDb Junit Extension is licensed under the [MIT](/LICENSE.md) license.
