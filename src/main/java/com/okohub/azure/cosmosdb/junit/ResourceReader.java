@@ -53,12 +53,12 @@ final class ResourceReader {
 
   private Optional<String> getResourceAsString(InputStream resource) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(resource));
-    String scriptData = reader.lines().collect(joining(lineSeparator()));
-    return Optional.of(scriptData);
+    String data = reader.lines().collect(joining(lineSeparator()));
+    return Optional.of(data);
   }
 
-  Stream<JsonNode> readResourceContentAsJsonStream(String resourceContent) throws JsonProcessingException {
-    JsonNode jsonNode = MAPPER.readTree(resourceContent);
+  Stream<JsonNode> readResourceContentAsJsonStream(String data) throws JsonProcessingException {
+    JsonNode jsonNode = MAPPER.readTree(data);
     Iterable<JsonNode> iterable = jsonNode::elements;
     return StreamSupport.stream(iterable.spliterator(), false);
   }

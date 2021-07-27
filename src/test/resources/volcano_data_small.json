@@ -1,0 +1,36 @@
+[
+  {
+    "Volcano Name": "Abu",
+    "Country": "Japan",
+    "Region": "Honshu-Japan",
+    "Location": {
+      "type": "Point",
+      "coordinates": [
+        131.6,
+        34.5
+      ]
+    },
+    "Elevation": 571,
+    "Type": "Shield volcano",
+    "Status": "Holocene",
+    "Last Known Eruption": "Unknown",
+    "id": "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766"
+  },
+  {
+    "Volcano Name": "Acamarachi",
+    "Country": "Chile",
+    "Region": "Chile-N",
+    "Location": {
+      "type": "Point",
+      "coordinates": [
+        -67.62,
+        -23.3
+      ]
+    },
+    "Elevation": 6046,
+    "Type": "Stratovolcano",
+    "Status": "Holocene",
+    "Last Known Eruption": "Unknown",
+    "id": "246927ec-11c6-56da-b97c-00e5ed69fd3f"
+  }
+]

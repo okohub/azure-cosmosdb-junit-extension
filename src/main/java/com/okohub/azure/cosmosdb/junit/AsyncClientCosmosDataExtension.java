@@ -2,9 +2,6 @@ package com.okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosClientBuilder;
-import com.azure.cosmos.GatewayConnectionConfig;
-import java.lang.reflect.Field;
-import java.time.Duration;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -12,45 +9,24 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 /**
  * @author onurozcan
  */
-public class AsyncClientCosmosScriptExtension extends AbstractCosmosScriptExtension {
+public class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension {
 
   private final CosmosAsyncClient cosmosClient;
 
-  public AsyncClientCosmosScriptExtension(CosmosAsyncClient client) {
+  public AsyncClientCosmosDataExtension(CosmosAsyncClient client) {
     this.cosmosClient = client;
   }
 
-  public AsyncClientCosmosScriptExtension(String endpoint, String key) {
-    GatewayConnectionConfig config = hackedGatewayConfig();
-    this.cosmosClient = new CosmosClientBuilder().gatewayMode(config)
+  public AsyncClientCosmosDataExtension(String endpoint, String key) {
+    this.cosmosClient = new CosmosClientBuilder().gatewayMode()
                                                  .endpointDiscoveryEnabled(false)
                                                  .endpoint(endpoint)
                                                  .key(key)
                                                  .buildAsyncClient();
   }
 
-  /**
-   * for large documents, 5 seconds sometimes not enough.
-   * However, requestTimeout setter in config is hidden for an unknown reason (still looking for why)
-   * So a bit hacky thing to make it double
-   *
-   * @return customized GatewayConnectionConfig
-   * @link {https://github.com/Azure/azure-sdk-for-java/pull/11702}
-   */
-  private GatewayConnectionConfig hackedGatewayConfig() {
-    GatewayConnectionConfig config = new GatewayConnectionConfig();
-    try {
-      Field requestTimeout = GatewayConnectionConfig.class.getDeclaredField("requestTimeout");
-      requestTimeout.setAccessible(true);
-      requestTimeout.set(config, Duration.ofSeconds(10));
-    } catch (Exception ex) {
-      //silent
-    }
-    return config;
-  }
-
   @Override
-  public void doBeforeEach(ExtensionContext context, CosmosScript annotation) throws Exception {
+  public void doBeforeEach(ExtensionContext context, CosmosData annotation) throws Exception {
     ResourceOperator resourceOperator = new ResourceOperator(cosmosClient, annotation);
     resourceOperator.createDatabase();
     resourceOperator.createContainer();
@@ -58,7 +34,7 @@ public class AsyncClientCosmosScriptExtension extends AbstractCosmosScriptExtens
   }
 
   @Override
-  public void doAfterEach(ExtensionContext context, CosmosScript annotation) {
+  public void doAfterEach(ExtensionContext context, CosmosData annotation) {
     ResourceOperator resourceOperator = new ResourceOperator(cosmosClient, annotation);
     resourceOperator.deleteDatabase();
   }
