@@ -22,13 +22,13 @@ import static com.azure.cosmos.implementation.batch.BatchRequestResponseConstant
 /**
  * @author Onur Kagan Ozcan
  */
-final class SyncCosmosDbBulkPopulator implements SyncCosmosDbPopulator {
+final class SyncCosmosDBBulkPopulator implements SyncCosmosDBPopulator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SyncCosmosDbBulkPopulator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SyncCosmosDBBulkPopulator.class);
 
   private final CosmosData annotation;
 
-  SyncCosmosDbBulkPopulator(CosmosData annotation) {
+  SyncCosmosDBBulkPopulator(CosmosData annotation) {
     this.annotation = annotation;
   }
 

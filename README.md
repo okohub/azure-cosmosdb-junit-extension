@@ -1,6 +1,6 @@
-# Azure CosmosDb Junit(5) Extension
+# Azure Cosmos DB Junit(5) Extension
 
-I created this extension after introducing Azure CosmosDb testcontainers plugin.
+I created this extension after introducing Azure Cosmos DB testcontainers plugin.
 
 WARNING!
 
@@ -46,4 +46,4 @@ public class MyAwesomeTests {
 
 ## License
 
-Azure CosmosDb Junit Extension is licensed under the [MIT](/LICENSE.md) license.
+Azure Cosmos DB Junit Extension is licensed under the [MIT](/LICENSE.md) license.

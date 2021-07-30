@@ -53,9 +53,9 @@ final class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension {
     return cosmosClient;
   }
 
-  private AsyncCosmosDbPopulator findPopulator(CosmosData annotation) {
+  private AsyncCosmosDBPopulator findPopulator(CosmosData annotation) {
     return annotation.useBulk()
-        ? new AsyncCosmosDbBulkPopulator(annotation)
-        : new AsyncCosmosDbSinglePopulator(annotation);
+        ? new AsyncCosmosDBBulkPopulator(annotation)
+        : new AsyncCosmosDBSinglePopulator(annotation);
   }
 }

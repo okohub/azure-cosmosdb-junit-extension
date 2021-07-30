@@ -21,12 +21,12 @@ final class SyncResourceOperator implements ResourceOperator {
 
   private final ResourceReader resourceReader;
 
-  private final SyncCosmosDbPopulator populator;
+  private final SyncCosmosDBPopulator populator;
 
   public SyncResourceOperator(CosmosClient client,
                               CosmosData annotation,
                               ResourceReader resourceReader,
-                              SyncCosmosDbPopulator populator) {
+                              SyncCosmosDBPopulator populator) {
     this.client = client;
     this.annotation = annotation;
     this.resourceReader = resourceReader;

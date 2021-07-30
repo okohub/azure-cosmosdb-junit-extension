@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Onur Kagan Ozcan
  */
-final class SyncCosmosDbSinglePopulator implements SyncCosmosDbPopulator {
+final class SyncCosmosDBSinglePopulator implements SyncCosmosDBPopulator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SyncCosmosDbSinglePopulator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SyncCosmosDBSinglePopulator.class);
 
   private final CosmosData annotation;
 
-  SyncCosmosDbSinglePopulator(CosmosData annotation) {
+  SyncCosmosDBSinglePopulator(CosmosData annotation) {
     this.annotation = annotation;
   }
 

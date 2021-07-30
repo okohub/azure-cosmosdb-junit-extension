@@ -6,7 +6,7 @@ import com.azure.cosmos.CosmosItemOperationType;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
 import java.util.HashMap;
-import okohub.azure.cosmosdb.junit.testcontainers.AbstractCosmosDbWithSyncClientTest;
+import okohub.azure.cosmosdb.junit.testcontainers.AbstractCosmosDBEmulatorWithSyncClientTest;
 import org.junit.jupiter.api.Test;
 
 import static okohub.azure.cosmosdb.junit.Constants.DEFAULT_CONTAINER;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Onur Kagan Ozcan
  */
-public class CosmosDataWithSyncClientTests extends AbstractCosmosDbWithSyncClientTest {
+public class CosmosDataWithSyncClientTests extends AbstractCosmosDBEmulatorWithSyncClientTest {
 
   @CosmosData(path = "volcano_data_big.json", partitionKey = "id", useBulk = true)
   @Test

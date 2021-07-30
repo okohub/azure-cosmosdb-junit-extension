@@ -13,13 +13,13 @@ import reactor.core.publisher.Mono;
 /**
  * @author Onur Kagan Ozcan
  */
-final class AsyncCosmosDbSinglePopulator implements AsyncCosmosDbPopulator {
+final class AsyncCosmosDBSinglePopulator implements AsyncCosmosDBPopulator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AsyncCosmosDbSinglePopulator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AsyncCosmosDBSinglePopulator.class);
 
   private final CosmosData annotation;
 
-  AsyncCosmosDbSinglePopulator(CosmosData annotation) {
+  AsyncCosmosDBSinglePopulator(CosmosData annotation) {
     this.annotation = annotation;
   }
 

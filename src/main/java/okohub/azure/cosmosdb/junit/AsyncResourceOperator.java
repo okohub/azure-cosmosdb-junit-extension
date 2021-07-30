@@ -21,12 +21,12 @@ final class AsyncResourceOperator implements ResourceOperator {
 
   private final ResourceReader resourceReader;
 
-  private final AsyncCosmosDbPopulator populator;
+  private final AsyncCosmosDBPopulator populator;
 
   AsyncResourceOperator(CosmosAsyncClient client,
                         CosmosData annotation,
                         ResourceReader resourceReader,
-                        AsyncCosmosDbPopulator populator) {
+                        AsyncCosmosDBPopulator populator) {
     this.client = client;
     this.annotation = annotation;
     this.resourceReader = resourceReader;
