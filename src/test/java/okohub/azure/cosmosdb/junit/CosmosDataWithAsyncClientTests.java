@@ -2,6 +2,7 @@ package okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosException;
+import com.azure.cosmos.CosmosItemOperationType;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
 import okohub.azure.cosmosdb.junit.testcontainers.AbstractCosmosDbWithAsyncClientTest;
@@ -32,7 +33,9 @@ public class CosmosDataWithAsyncClientTests extends AbstractCosmosDbWithAsyncCli
     assertThat(firstItem).containsEntry("id", firstItemId);
   }
 
-  @CosmosData(path = "volcano_data_small.json", partitionKey = "id")
+  @CosmosData(path = "volcano_data_small.json",
+              partitionKey = "id",
+              operationType = CosmosItemOperationType.UPSERT)
   @Test
   public void shouldReadFirstDataItemFromSmallData(CosmosAsyncClient client) {
     String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";

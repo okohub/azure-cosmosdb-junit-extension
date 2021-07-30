@@ -27,7 +27,7 @@ public class MyAwesomeTests {
   //here may be some awesome testcontainers code, you can check module tests!
 
   @RegisterExtension
-  CosmosDataExtension cosmosDataExtension = CosmosDataExtensions.async("endpoint", "key");
+  CosmosDataExtension cosmosDataExtension = CosmosDataExtensions.withAsyncClient("endpoint", "key");
 
   @CosmosData(path = "data.json", partitionKey = "id")
   @Test
@@ -40,7 +40,7 @@ public class MyAwesomeTests {
 ## Features
 
 - Support for data load: Just from your test resources or absolute path.
-- Autoconfiguration for cool clients: Just inject to your test method. Neat!
+- Autoconfiguration for clients: Just inject to your test method. Neat!
 - Sensible defaults for minimum code: You don't need to provide every detail. Just test your code!
 - Optional testcontainers abstractions for tests: Just provide necessary dependencies.
 

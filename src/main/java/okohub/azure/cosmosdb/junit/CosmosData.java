@@ -30,7 +30,7 @@ public @interface CosmosData {
   /**
    * currently supported for:
    * CREATE (default)
-   * REPLACE
+   * REPLACE -> when using replace, keep in mind that there must be an existing data
    * UPSERT
    */
   CosmosItemOperationType operationType() default CosmosItemOperationType.CREATE;

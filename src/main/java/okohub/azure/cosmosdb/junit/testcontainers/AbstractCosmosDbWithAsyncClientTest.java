@@ -19,10 +19,11 @@ import static org.testcontainers.utility.DockerImageName.parse;
 public class AbstractCosmosDbWithAsyncClientTest {
 
   @Container
-  protected static final CosmosDbEmulatorContainer CONTAINER =
+  protected static final CosmosDbEmulatorContainer SHARED_CONTAINER =
       new CosmosDbEmulatorContainer(parse(LINUX_AZURE_COSMOS_EMULATOR));
 
   @RegisterExtension
-  protected CosmosDataExtension cosmosDataExtension = CosmosDataExtensions.async(CONTAINER.getEmulatorEndpoint(),
-                                                                                 CONTAINER.getEmulatorLocalKey());
+  protected CosmosDataExtension cosmosDataExtension =
+      CosmosDataExtensions.withAsyncClient(SHARED_CONTAINER.getEmulatorEndpoint(),
+                                           SHARED_CONTAINER.getEmulatorLocalKey());
 }

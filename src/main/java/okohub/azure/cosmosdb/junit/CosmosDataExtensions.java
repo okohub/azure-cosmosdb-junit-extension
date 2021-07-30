@@ -5,11 +5,11 @@ package okohub.azure.cosmosdb.junit;
  */
 public final class CosmosDataExtensions {
 
-  public static CosmosDataExtension sync(String endpoint, String key) {
+  public static CosmosDataExtension withSyncClient(String endpoint, String key) {
     return new SyncClientCosmosDataExtension(endpoint, key);
   }
 
-  public static CosmosDataExtension async(String endpoint, String key) {
+  public static CosmosDataExtension withAsyncClient(String endpoint, String key) {
     return new AsyncClientCosmosDataExtension(endpoint, key);
   }
 }
