@@ -1,4 +1,4 @@
-package com.okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit;
 
 import com.azure.core.util.Context;
 import com.azure.cosmos.CosmosAsyncContainer;
@@ -22,15 +22,15 @@ import static com.azure.cosmos.BulkOperations.getUpsertItemOperation;
 import static com.azure.cosmos.implementation.batch.BatchRequestResponseConstants.MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST;
 
 /**
- * @author onurozcan
+ * @author Onur Kagan Ozcan
  */
-final class CosmosDbBulkPopulator implements CosmosDbPopulator {
+final class AsyncCosmosDbBulkPopulator implements AsyncCosmosDbPopulator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CosmosDbBulkPopulator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AsyncCosmosDbBulkPopulator.class);
 
   private final CosmosData annotation;
 
-  CosmosDbBulkPopulator(CosmosData annotation) {
+  AsyncCosmosDbBulkPopulator(CosmosData annotation) {
     this.annotation = annotation;
   }
 

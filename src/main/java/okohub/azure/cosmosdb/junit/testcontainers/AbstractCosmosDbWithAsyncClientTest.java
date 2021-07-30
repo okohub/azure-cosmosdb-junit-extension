@@ -1,6 +1,7 @@
-package com.okohub.azure.cosmosdb.junit.testcontainers;
+package okohub.azure.cosmosdb.junit.testcontainers;
 
-import com.okohub.azure.cosmosdb.junit.AsyncClientCosmosDataExtension;
+import okohub.azure.cosmosdb.junit.CosmosDataExtension;
+import okohub.azure.cosmosdb.junit.CosmosDataExtensions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.testcontainers.containers.CosmosDbEmulatorContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -12,16 +13,16 @@ import static org.testcontainers.utility.DockerImageName.parse;
 /**
  * Simple abstraction for ready-to-use emulator and client
  *
- * @author onurozcan
+ * @author Onur Kagan Ozcan
  */
 @Testcontainers
-public class AbstractCosmosDbEmulatorContainerTest {
+public class AbstractCosmosDbWithAsyncClientTest {
 
   @Container
   protected static final CosmosDbEmulatorContainer CONTAINER =
       new CosmosDbEmulatorContainer(parse(LINUX_AZURE_COSMOS_EMULATOR));
 
   @RegisterExtension
-  protected AsyncClientCosmosDataExtension cosmosDataExtension =
-      new AsyncClientCosmosDataExtension(CONTAINER.getEmulatorEndpoint(), CONTAINER.getEmulatorLocalKey());
+  protected CosmosDataExtension cosmosDataExtension = CosmosDataExtensions.async(CONTAINER.getEmulatorEndpoint(),
+                                                                                 CONTAINER.getEmulatorLocalKey());
 }

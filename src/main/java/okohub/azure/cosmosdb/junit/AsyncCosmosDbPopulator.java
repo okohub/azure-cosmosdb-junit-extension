@@ -1,13 +1,13 @@
-package com.okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.CosmosAsyncContainer;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.stream.Stream;
 
 /**
- * @author onurozcan
+ * @author Onur Kagan Ozcan
  */
-interface CosmosDbPopulator {
+interface AsyncCosmosDbPopulator {
 
   /**
    * @return request charge as request units (RU) consumed by the operation.

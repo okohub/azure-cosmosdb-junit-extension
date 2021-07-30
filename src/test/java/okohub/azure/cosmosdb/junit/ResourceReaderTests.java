@@ -1,4 +1,4 @@
-package com.okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author onurozcan
+ * @author Onur Kagan Ozcan
  */
 public class ResourceReaderTests {
 

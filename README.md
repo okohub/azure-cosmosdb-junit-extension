@@ -10,10 +10,15 @@ See https://github.com/testcontainers/testcontainers-java/pull/4303
 
 ## Usage
 
+CosmosDataExtensions class is entry point for extensions.
+
+You can use sync or async extensions, both will configure proper client for you.
+
 ````java
 import com.azure.cosmos.CosmosAsyncClient;
-import com.okohub.azure.cosmosdb.junit.AsyncClientCosmosDataExtension;
-import com.okohub.azure.cosmosdb.junit.CosmosData;
+import okohub.azure.cosmosdb.junit.CosmosData;
+import okohub.azure.cosmosdb.junit.CosmosDataExtension;
+import okohub.azure.cosmosdb.junit.CosmosDataExtensions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -22,8 +27,7 @@ public class MyAwesomeTests {
   //here may be some awesome testcontainers code, you can check module tests!
 
   @RegisterExtension
-  AsyncClientCosmosDataExtension cosmosDataExtension =
-      new AsyncClientCosmosDataExtension("endpoint", "key");
+  CosmosDataExtension cosmosDataExtension = CosmosDataExtensions.async("endpoint", "key");
 
   @CosmosData(path = "data.json", partitionKey = "id")
   @Test
@@ -32,12 +36,14 @@ public class MyAwesomeTests {
   }
 }
 ````
+
 ## Features
 
-- Supported data loading from resources or absolute path.
-- Use autoconfigured cool CosmosAsyncClient by injecting to test method. Neat!
-- `@CosmosData` annotation has sensible defaults, so you don't need to provide every detail. Just test your code!
-- Optional testcontainers abstraction for tests, but you need to provide necessary dependencies.
+- Support for data load: Just from your test resources or absolute path.
+- Autoconfiguration for cool clients: Just inject to your test method. Neat!
+- Sensible defaults for minimum code: You don't need to provide every detail. Just test your code!
+- Optional testcontainers abstractions for tests: Just provide necessary dependencies.
 
 ## License
+
 Azure CosmosDb Junit Extension is licensed under the [MIT](/LICENSE.md) license.

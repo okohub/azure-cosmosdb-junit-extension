@@ -1,4 +1,4 @@
-package com.okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.CosmosItemOperationType;
 import java.lang.annotation.Documented;
@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author onurozcan
+ * @author Onur Kagan Ozcan
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -42,7 +42,7 @@ public @interface CosmosData {
    *
    * @see com.azure.cosmos.implementation.batch.BatchRequestResponseConstants#MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST
    */
-  int bulkChunkSize() default Constants.DEFAULT_CHUNK_SIZE;
+  int bulkChunkSize() default Constants.DEFAULT_BULK_CHUNK_SIZE;
 
   String idKey() default Constants.DEFAULT_ID_KEY;
 

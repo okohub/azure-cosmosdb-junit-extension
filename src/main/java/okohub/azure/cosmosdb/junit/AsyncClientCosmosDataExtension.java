@@ -1,4 +1,4 @@
-package com.okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosClientBuilder;
@@ -7,17 +7,13 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 
 /**
- * @author onurozcan
+ * @author Onur Kagan Ozcan
  */
-public class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension {
+final class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension {
 
   private final CosmosAsyncClient cosmosClient;
 
-  public AsyncClientCosmosDataExtension(CosmosAsyncClient client) {
-    this.cosmosClient = client;
-  }
-
-  public AsyncClientCosmosDataExtension(String endpoint, String key) {
+  AsyncClientCosmosDataExtension(String endpoint, String key) {
     this.cosmosClient = new CosmosClientBuilder().gatewayMode()
                                                  .endpointDiscoveryEnabled(false)
                                                  .endpoint(endpoint)
@@ -27,16 +23,22 @@ public class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension 
 
   @Override
   public void doBeforeEach(ExtensionContext context, CosmosData annotation) throws Exception {
-    ResourceOperator resourceOperator = new ResourceOperator(cosmosClient, annotation);
-    resourceOperator.createDatabase();
-    resourceOperator.createContainer();
-    resourceOperator.populate();
+    ResourceOperator operator = new AsyncResourceOperator(cosmosClient,
+                                                          annotation,
+                                                          new ResourceReader(),
+                                                          findPopulator(annotation));
+    operator.createDatabase();
+    operator.createContainer();
+    operator.populate();
   }
 
   @Override
   public void doAfterEach(ExtensionContext context, CosmosData annotation) {
-    ResourceOperator resourceOperator = new ResourceOperator(cosmosClient, annotation);
-    resourceOperator.deleteDatabase();
+    ResourceOperator operator = new AsyncResourceOperator(cosmosClient,
+                                                          annotation,
+                                                          new ResourceReader(),
+                                                          findPopulator(annotation));
+    operator.deleteDatabase();
   }
 
   @Override
@@ -49,5 +51,11 @@ public class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension 
   public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
     return cosmosClient;
+  }
+
+  private AsyncCosmosDbPopulator findPopulator(CosmosData annotation) {
+    return annotation.useBulk()
+        ? new AsyncCosmosDbBulkPopulator(annotation)
+        : new AsyncCosmosDbSinglePopulator(annotation);
   }
 }

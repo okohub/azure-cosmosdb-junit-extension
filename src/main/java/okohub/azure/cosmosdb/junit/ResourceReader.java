@@ -1,4 +1,4 @@
-package com.okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,7 +18,7 @@ import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
 
 /**
- * @author onurozcan
+ * @author Onur Kagan Ozcan
  */
 final class ResourceReader {
 

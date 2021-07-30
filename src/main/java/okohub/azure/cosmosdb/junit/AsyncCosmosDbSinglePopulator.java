@@ -1,4 +1,4 @@
-package com.okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.CosmosAsyncContainer;
 import com.azure.cosmos.models.CosmosItemResponse;
@@ -11,15 +11,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * @author onurozcan
+ * @author Onur Kagan Ozcan
  */
-final class CosmosDbSinglePopulator implements CosmosDbPopulator {
+final class AsyncCosmosDbSinglePopulator implements AsyncCosmosDbPopulator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CosmosDbSinglePopulator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AsyncCosmosDbSinglePopulator.class);
 
   private final CosmosData annotation;
 
-  CosmosDbSinglePopulator(CosmosData annotation) {
+  AsyncCosmosDbSinglePopulator(CosmosData annotation) {
     this.annotation = annotation;
   }
 
