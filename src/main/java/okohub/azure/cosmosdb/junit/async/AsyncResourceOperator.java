@@ -1,32 +1,35 @@
-package okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit.async;
 
-import com.azure.cosmos.CosmosClient;
-import com.azure.cosmos.CosmosContainer;
+import com.azure.cosmos.CosmosAsyncClient;
+import com.azure.cosmos.CosmosAsyncContainer;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Optional;
 import java.util.stream.Stream;
+import okohub.azure.cosmosdb.junit.CosmosData;
+import okohub.azure.cosmosdb.junit.core.ResourceOperator;
+import okohub.azure.cosmosdb.junit.core.ResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Onur Kagan Ozcan
  */
-final class SyncResourceOperator implements ResourceOperator {
+final class AsyncResourceOperator implements ResourceOperator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SyncResourceOperator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AsyncResourceOperator.class);
 
-  private final CosmosClient client;
+  private final CosmosAsyncClient client;
 
   private final CosmosData annotation;
 
   private final ResourceReader resourceReader;
 
-  private final SyncCosmosDBPopulator populator;
+  private final AsyncCosmosDBPopulator populator;
 
-  public SyncResourceOperator(CosmosClient client,
-                              CosmosData annotation,
-                              ResourceReader resourceReader,
-                              SyncCosmosDBPopulator populator) {
+  AsyncResourceOperator(CosmosAsyncClient client,
+                        CosmosData annotation,
+                        ResourceReader resourceReader,
+                        AsyncCosmosDBPopulator populator) {
     this.client = client;
     this.annotation = annotation;
     this.resourceReader = resourceReader;
@@ -36,7 +39,7 @@ final class SyncResourceOperator implements ResourceOperator {
   @Override
   public void createDatabase() {
     String database = annotation.database();
-    client.createDatabaseIfNotExists(database);
+    client.createDatabaseIfNotExists(database).block();
   }
 
   @Override
@@ -44,7 +47,8 @@ final class SyncResourceOperator implements ResourceOperator {
     String database = annotation.database();
     String container = annotation.container();
     client.getDatabase(database)
-          .createContainerIfNotExists(container, "/" + annotation.partitionKey());
+          .createContainerIfNotExists(container, "/" + annotation.partitionKey())
+          .block();
   }
 
   @Override
@@ -55,8 +59,8 @@ final class SyncResourceOperator implements ResourceOperator {
       LOGGER.error("Can not populate because data is not found. DataPath: {}", dataPath);
       return;
     }
-    CosmosContainer container = client.getDatabase(annotation.database())
-                                      .getContainer(annotation.container());
+    CosmosAsyncContainer container = client.getDatabase(annotation.database())
+                                           .getContainer(annotation.container());
     Stream<JsonNode> targetStream = resourceReader.readResourceContentAsJsonStream(dataContainer.get());
     //
     Double totalRequestCharge = populator.populate(container, targetStream);
@@ -66,6 +70,6 @@ final class SyncResourceOperator implements ResourceOperator {
   @Override
   public void deleteDatabase() {
     String database = annotation.database();
-    client.getDatabase(database).delete();
+    client.getDatabase(database).delete().block();
   }
 }

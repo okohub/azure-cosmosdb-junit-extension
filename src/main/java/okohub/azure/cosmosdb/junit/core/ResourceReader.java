@@ -1,4 +1,4 @@
-package okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,11 +20,11 @@ import static java.util.stream.Collectors.joining;
 /**
  * @author Onur Kagan Ozcan
  */
-final class ResourceReader {
+public final class ResourceReader {
 
   private final static ObjectMapper MAPPER = new ObjectMapper();
 
-  Optional<String> readResource(String resourcePath) {
+  public Optional<String> readResource(String resourcePath) {
     if (resourcePath.startsWith("/")) {
       return readResourceFromPath(resourcePath);
     }
@@ -57,7 +57,7 @@ final class ResourceReader {
     return Optional.of(data);
   }
 
-  Stream<JsonNode> readResourceContentAsJsonStream(String data) throws JsonProcessingException {
+  public Stream<JsonNode> readResourceContentAsJsonStream(String data) throws JsonProcessingException {
     JsonNode jsonNode = MAPPER.readTree(data);
     Iterable<JsonNode> iterable = jsonNode::elements;
     return StreamSupport.stream(iterable.spliterator(), false);

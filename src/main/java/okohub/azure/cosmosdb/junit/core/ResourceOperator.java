@@ -1,9 +1,9 @@
-package okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit.core;
 
 /**
  * @author Onur Kagan Ozcan
  */
-interface ResourceOperator {
+public interface ResourceOperator {
 
   void createDatabase();
 

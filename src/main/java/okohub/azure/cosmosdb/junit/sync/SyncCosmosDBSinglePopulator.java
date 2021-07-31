@@ -1,4 +1,4 @@
-package okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit.sync;
 
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
@@ -6,6 +6,7 @@ import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.stream.Stream;
+import okohub.azure.cosmosdb.junit.CosmosData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

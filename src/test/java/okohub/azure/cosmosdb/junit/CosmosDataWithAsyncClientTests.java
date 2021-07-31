@@ -1,12 +1,13 @@
 package okohub.azure.cosmosdb.junit;
 
 import com.azure.cosmos.CosmosAsyncClient;
+import com.azure.cosmos.CosmosAsyncContainer;
 import com.azure.cosmos.CosmosException;
 import com.azure.cosmos.CosmosItemOperationType;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
-import okohub.azure.cosmosdb.junit.testcontainers.AbstractCosmosDBEmulatorWithAsyncClientTest;
 import java.util.HashMap;
+import okohub.azure.cosmosdb.junit.extra.testcontainers.AbstractCosmosDBEmulatorWithAsyncClientTest;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,12 +22,10 @@ public class CosmosDataWithAsyncClientTests extends AbstractCosmosDBEmulatorWith
   @Test
   public void shouldReadFirstDataItemFromBigData(CosmosAsyncClient client) {
     String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";
-    CosmosItemResponse<HashMap> firstItemResponse = client.getDatabase(Constants.DEFAULT_DATABASE)
-                                                          .getContainer(Constants.DEFAULT_CONTAINER)
-                                                          .readItem(firstItemId,
-                                                                    new PartitionKey(firstItemId),
-                                                                    HashMap.class)
-                                                          .block();
+    CosmosItemResponse<HashMap> firstItemResponse = getDefaultContainer(client).readItem(firstItemId,
+                                                                                         new PartitionKey(firstItemId),
+                                                                                         HashMap.class)
+                                                                               .block();
     assertThat(firstItemResponse.getStatusCode()).isEqualTo(200);
     HashMap firstItem = firstItemResponse.getItem();
     assertThat(firstItem).hasSize(14);
@@ -39,12 +38,10 @@ public class CosmosDataWithAsyncClientTests extends AbstractCosmosDBEmulatorWith
   @Test
   public void shouldReadFirstDataItemFromSmallData(CosmosAsyncClient client) {
     String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";
-    CosmosItemResponse<HashMap> firstItemResponse = client.getDatabase(Constants.DEFAULT_DATABASE)
-                                                          .getContainer(Constants.DEFAULT_CONTAINER)
-                                                          .readItem(firstItemId,
-                                                                    new PartitionKey(firstItemId),
-                                                                    HashMap.class)
-                                                          .block();
+    CosmosItemResponse<HashMap> firstItemResponse = getDefaultContainer(client).readItem(firstItemId,
+                                                                                         new PartitionKey(firstItemId),
+                                                                                         HashMap.class)
+                                                                               .block();
     assertThat(firstItemResponse.getStatusCode()).isEqualTo(200);
     HashMap firstItem = firstItemResponse.getItem();
     assertThat(firstItem).hasSize(14);
@@ -55,12 +52,15 @@ public class CosmosDataWithAsyncClientTests extends AbstractCosmosDBEmulatorWith
   public void shouldNotReadFirstDataItemFromCosmosDbBecauseOfNonexistence(CosmosAsyncClient client) {
     assertThrows(CosmosException.class, () -> {
       String firstItemId = "4cb67ab0-ba1a-0e8a-8dfc-d48472fd5766";
-      client.getDatabase("mytest")
-            .getContainer("volcanos")
-            .readItem(firstItemId,
-                      new PartitionKey(firstItemId),
-                      HashMap.class)
-            .block();
+      getDefaultContainer(client).readItem(firstItemId,
+                                           new PartitionKey(firstItemId),
+                                           HashMap.class)
+                                 .block();
     });
+  }
+
+  private CosmosAsyncContainer getDefaultContainer(CosmosAsyncClient client) {
+    return client.getDatabase("COSMOS_DB_EMULATOR_DATABASE")
+                 .getContainer("COSMOS_DB_EMULATOR_CONTAINER");
   }
 }

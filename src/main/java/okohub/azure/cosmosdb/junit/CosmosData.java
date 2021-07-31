@@ -23,9 +23,9 @@ public @interface CosmosData {
    */
   String path();
 
-  String database() default Constants.DEFAULT_DATABASE;
+  String database() default "COSMOS_DB_EMULATOR_DATABASE";
 
-  String container() default Constants.DEFAULT_CONTAINER;
+  String container() default "COSMOS_DB_EMULATOR_CONTAINER";
 
   /**
    * currently supported for:
@@ -42,9 +42,9 @@ public @interface CosmosData {
    *
    * @see com.azure.cosmos.implementation.batch.BatchRequestResponseConstants#MAX_OPERATIONS_IN_DIRECT_MODE_BATCH_REQUEST
    */
-  int bulkChunkSize() default Constants.DEFAULT_BULK_CHUNK_SIZE;
+  int bulkChunkSize() default 50;
 
-  String idKey() default Constants.DEFAULT_ID_KEY;
+  String idKey() default "id";
 
   String partitionKey();
 }

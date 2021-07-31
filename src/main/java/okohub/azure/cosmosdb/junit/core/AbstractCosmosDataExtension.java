@@ -1,14 +1,16 @@
-package okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit.core;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Objects;
 import java.util.Optional;
+import okohub.azure.cosmosdb.junit.CosmosData;
+import okohub.azure.cosmosdb.junit.CosmosDataExtension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
  * @author Onur Kagan Ozcan
  */
-abstract class AbstractCosmosDataExtension implements CosmosDataExtension {
+public abstract class AbstractCosmosDataExtension implements CosmosDataExtension {
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
@@ -19,7 +21,7 @@ abstract class AbstractCosmosDataExtension implements CosmosDataExtension {
     doBeforeEach(context, annotationContainer.get());
   }
 
-  abstract void doBeforeEach(ExtensionContext context, CosmosData annotation) throws Exception;
+  protected abstract void doBeforeEach(ExtensionContext context, CosmosData annotation) throws Exception;
 
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
@@ -30,7 +32,7 @@ abstract class AbstractCosmosDataExtension implements CosmosDataExtension {
     doAfterEach(context, annotationContainer.get());
   }
 
-  abstract void doAfterEach(ExtensionContext context, CosmosData annotation) throws Exception;
+  protected abstract void doAfterEach(ExtensionContext context, CosmosData annotation) throws Exception;
 
   private Optional<CosmosData> findAnnotation(ExtensionContext context) {
     Optional<AnnotatedElement> elementContainer = context.getElement();

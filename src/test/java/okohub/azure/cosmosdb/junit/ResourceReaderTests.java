@@ -2,8 +2,10 @@ package okohub.azure.cosmosdb.junit;
 
 import java.nio.file.Path;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
+import okohub.azure.cosmosdb.junit.core.ResourceReader;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Onur Kagan Ozcan
@@ -14,14 +16,14 @@ public class ResourceReaderTests {
   public void shouldFindResourceByResources() {
     ResourceReader resourceReader = new ResourceReader();
     Optional<String> dataContainer = resourceReader.readResource("volcano_data_small.json");
-    Assertions.assertThat(dataContainer).isNotEmpty();
+    assertThat(dataContainer).isNotEmpty();
   }
 
   @Test
   public void shouldNotFindResourceByResources() {
     ResourceReader resourceReader = new ResourceReader();
     Optional<String> dataContainer = resourceReader.readResource("foo.unknown");
-    Assertions.assertThat(dataContainer).isEmpty();
+    assertThat(dataContainer).isEmpty();
   }
 
   @Test
@@ -29,7 +31,7 @@ public class ResourceReaderTests {
     ResourceReader resourceReader = new ResourceReader();
     String pwd = Path.of("").toAbsolutePath().toString();
     Optional<String> dataContainer = resourceReader.readResource(pwd + "/pom.xml");
-    Assertions.assertThat(dataContainer).isNotEmpty();
+    assertThat(dataContainer).isNotEmpty();
   }
 
   @Test
@@ -37,6 +39,6 @@ public class ResourceReaderTests {
     ResourceReader resourceReader = new ResourceReader();
     String pwd = Path.of("").toAbsolutePath().toString();
     Optional<String> dataContainer = resourceReader.readResource(pwd + "/bar.xml");
-    Assertions.assertThat(dataContainer).isEmpty();
+    assertThat(dataContainer).isEmpty();
   }
 }

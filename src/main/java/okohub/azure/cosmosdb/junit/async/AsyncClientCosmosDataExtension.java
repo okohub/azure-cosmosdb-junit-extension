@@ -1,7 +1,11 @@
-package okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit.async;
 
 import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosClientBuilder;
+import okohub.azure.cosmosdb.junit.CosmosData;
+import okohub.azure.cosmosdb.junit.core.AbstractCosmosDataExtension;
+import okohub.azure.cosmosdb.junit.core.ResourceOperator;
+import okohub.azure.cosmosdb.junit.core.ResourceReader;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -9,11 +13,11 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 /**
  * @author Onur Kagan Ozcan
  */
-final class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension {
+public final class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension {
 
   private final CosmosAsyncClient cosmosClient;
 
-  AsyncClientCosmosDataExtension(String endpoint, String key) {
+  public AsyncClientCosmosDataExtension(String endpoint, String key) {
     this.cosmosClient = new CosmosClientBuilder().gatewayMode()
                                                  .endpointDiscoveryEnabled(false)
                                                  .endpoint(endpoint)
@@ -22,7 +26,7 @@ final class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension {
   }
 
   @Override
-  public void doBeforeEach(ExtensionContext context, CosmosData annotation) throws Exception {
+  protected void doBeforeEach(ExtensionContext context, CosmosData annotation) throws Exception {
     ResourceOperator operator = new AsyncResourceOperator(cosmosClient,
                                                           annotation,
                                                           new ResourceReader(),
@@ -33,7 +37,7 @@ final class AsyncClientCosmosDataExtension extends AbstractCosmosDataExtension {
   }
 
   @Override
-  public void doAfterEach(ExtensionContext context, CosmosData annotation) {
+  protected void doAfterEach(ExtensionContext context, CosmosData annotation) {
     ResourceOperator operator = new AsyncResourceOperator(cosmosClient,
                                                           annotation,
                                                           new ResourceReader(),

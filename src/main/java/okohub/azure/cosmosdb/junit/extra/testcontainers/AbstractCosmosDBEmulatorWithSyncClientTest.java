@@ -1,4 +1,4 @@
-package okohub.azure.cosmosdb.junit.testcontainers;
+package okohub.azure.cosmosdb.junit.extra.testcontainers;
 
 import okohub.azure.cosmosdb.junit.CosmosDataExtension;
 import okohub.azure.cosmosdb.junit.CosmosDataExtensions;
@@ -16,7 +16,7 @@ import static org.testcontainers.utility.DockerImageName.parse;
  * @author Onur Kagan Ozcan
  */
 @Testcontainers
-public class AbstractCosmosDBEmulatorWithAsyncClientTest {
+public class AbstractCosmosDBEmulatorWithSyncClientTest {
 
   @Container
   protected static final CosmosDBEmulatorContainer SHARED_CONTAINER =
@@ -24,6 +24,6 @@ public class AbstractCosmosDBEmulatorWithAsyncClientTest {
 
   @RegisterExtension
   protected CosmosDataExtension cosmosDataExtension =
-      CosmosDataExtensions.withAsyncClient(SHARED_CONTAINER.getEmulatorEndpoint(),
-                                           SHARED_CONTAINER.getEmulatorLocalKey());
+      CosmosDataExtensions.withSyncClient(SHARED_CONTAINER.getEmulatorEndpoint(),
+                                          SHARED_CONTAINER.getEmulatorLocalKey());
 }

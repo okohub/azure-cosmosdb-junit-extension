@@ -1,4 +1,4 @@
-package okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit.sync;
 
 import com.azure.cosmos.CosmosContainer;
 import com.fasterxml.jackson.databind.JsonNode;

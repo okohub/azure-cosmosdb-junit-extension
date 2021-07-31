@@ -1,4 +1,4 @@
-package okohub.azure.cosmosdb.junit;
+package okohub.azure.cosmosdb.junit.sync;
 
 import com.azure.cosmos.CosmosBulkOperationResponse;
 import com.azure.cosmos.CosmosContainer;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+import okohub.azure.cosmosdb.junit.CosmosData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

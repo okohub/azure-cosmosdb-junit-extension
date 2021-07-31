@@ -1,5 +1,8 @@
 package okohub.azure.cosmosdb.junit;
 
+import okohub.azure.cosmosdb.junit.async.AsyncClientCosmosDataExtension;
+import okohub.azure.cosmosdb.junit.sync.SyncClientCosmosDataExtension;
+
 /**
  * @author Onur Kagan Ozcan
  */
