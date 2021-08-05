@@ -26,8 +26,8 @@ public class CosmosDataWithAsyncClientTests extends AbstractCosmosDBEmulatorTest
    * It means a fresh client is recreated and destroyed for every test method.
    */
   @RegisterExtension
-  protected CosmosDataExtension cosmosDataExtension = withAsyncClient(SHARED_CONTAINER.getEmulatorEndpoint(),
-                                                                      SHARED_CONTAINER.getEmulatorKey());
+  CosmosDataExtension cosmosDataExtension = withAsyncClient(SHARED_CONTAINER.getEmulatorEndpoint(),
+                                                            SHARED_CONTAINER.getEmulatorKey());
 
   @CosmosData(path = "volcano_data_big.json", partitionKey = "id", useBulk = true)
   @Test
