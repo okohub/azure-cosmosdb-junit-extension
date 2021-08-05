@@ -9,6 +9,7 @@ import okohub.azure.cosmosdb.junit.core.ResourceReader;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.TestInstancePreDestroyCallback;
 
 /**
  * @author Onur Kagan Ozcan
@@ -45,6 +46,17 @@ public final class SyncClientCosmosDataExtension extends AbstractCosmosDataExten
     operator.deleteDatabase();
   }
 
+  private SyncCosmosDBPopulator findPopulator(CosmosData annotation) {
+    return annotation.useBulk()
+        ? new SyncCosmosDBBulkPopulator(annotation)
+        : new SyncCosmosDBSinglePopulator(annotation);
+  }
+
+  @Override
+  public void preDestroyTestInstance(ExtensionContext context) {
+    TestInstancePreDestroyCallback.preDestroyTestInstances(context, o -> cosmosClient.close());
+  }
+
   @Override
   public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
@@ -55,11 +67,5 @@ public final class SyncClientCosmosDataExtension extends AbstractCosmosDataExten
   public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
     return cosmosClient;
-  }
-
-  private SyncCosmosDBPopulator findPopulator(CosmosData annotation) {
-    return annotation.useBulk()
-        ? new SyncCosmosDBBulkPopulator(annotation)
-        : new SyncCosmosDBSinglePopulator(annotation);
   }
 }

@@ -7,16 +7,27 @@ import com.azure.cosmos.CosmosItemOperationType;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
 import java.util.HashMap;
-import okohub.azure.cosmosdb.junit.extra.testcontainers.AbstractCosmosDBEmulatorWithAsyncClientTest;
+import okohub.azure.cosmosdb.junit.extra.testcontainers.AbstractCosmosDBEmulatorTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
+import static okohub.azure.cosmosdb.junit.CosmosDataExtensions.withAsyncClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Onur Kagan Ozcan
  */
-public class CosmosDataWithAsyncClientTests extends AbstractCosmosDBEmulatorWithAsyncClientTest {
+public class CosmosDataWithAsyncClientTests extends AbstractCosmosDBEmulatorTest {
+
+  /**
+   * This extension can not be used static, because container must be started before.
+   * That's why, extension is instance field.
+   * It means a fresh client is recreated and destroyed for every test method.
+   */
+  @RegisterExtension
+  protected CosmosDataExtension cosmosDataExtension = withAsyncClient(SHARED_CONTAINER.getEmulatorEndpoint(),
+                                                                      SHARED_CONTAINER.getEmulatorKey());
 
   @CosmosData(path = "volcano_data_big.json", partitionKey = "id", useBulk = true)
   @Test
