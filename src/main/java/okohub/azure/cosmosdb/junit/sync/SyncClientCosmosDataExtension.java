@@ -2,8 +2,10 @@ package okohub.azure.cosmosdb.junit.sync;
 
 import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
+import java.util.function.Supplier;
 import okohub.azure.cosmosdb.junit.CosmosData;
 import okohub.azure.cosmosdb.junit.core.AbstractCosmosDataExtension;
+import okohub.azure.cosmosdb.junit.core.Lazy;
 import okohub.azure.cosmosdb.junit.core.ResourceOperator;
 import okohub.azure.cosmosdb.junit.core.ResourceReader;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -16,19 +18,23 @@ import org.junit.jupiter.api.extension.TestInstancePreDestroyCallback;
  */
 public final class SyncClientCosmosDataExtension extends AbstractCosmosDataExtension {
 
-  private final CosmosClient cosmosClient;
+  private final Supplier<CosmosClient> cosmosClientSupplier;
 
   public SyncClientCosmosDataExtension(String endpoint, String key) {
-    this.cosmosClient = new CosmosClientBuilder().gatewayMode()
-                                                 .endpointDiscoveryEnabled(false)
-                                                 .endpoint(endpoint)
-                                                 .key(key)
-                                                 .buildClient();
+    this(new Lazy<>(() -> new CosmosClientBuilder().gatewayMode()
+                                                   .endpointDiscoveryEnabled(false)
+                                                   .endpoint(endpoint)
+                                                   .key(key)
+                                                   .buildClient()));
+  }
+
+  public SyncClientCosmosDataExtension(Supplier<CosmosClient> cosmosClientSupplier) {
+    this.cosmosClientSupplier = new Lazy<>(cosmosClientSupplier);
   }
 
   @Override
   protected void doBeforeEach(ExtensionContext context, CosmosData annotation) throws Exception {
-    ResourceOperator operator = new SyncResourceOperator(cosmosClient,
+    ResourceOperator operator = new SyncResourceOperator(cosmosClientSupplier.get(),
                                                          annotation,
                                                          new ResourceReader(),
                                                          findPopulator(annotation));
@@ -39,7 +45,7 @@ public final class SyncClientCosmosDataExtension extends AbstractCosmosDataExten
 
   @Override
   protected void doAfterEach(ExtensionContext context, CosmosData annotation) {
-    ResourceOperator operator = new SyncResourceOperator(cosmosClient,
+    ResourceOperator operator = new SyncResourceOperator(cosmosClientSupplier.get(),
                                                          annotation,
                                                          new ResourceReader(),
                                                          findPopulator(annotation));
@@ -54,7 +60,7 @@ public final class SyncClientCosmosDataExtension extends AbstractCosmosDataExten
 
   @Override
   public void preDestroyTestInstance(ExtensionContext context) {
-    TestInstancePreDestroyCallback.preDestroyTestInstances(context, o -> cosmosClient.close());
+    TestInstancePreDestroyCallback.preDestroyTestInstances(context, o -> cosmosClientSupplier.get().close());
   }
 
   @Override
@@ -66,6 +72,6 @@ public final class SyncClientCosmosDataExtension extends AbstractCosmosDataExten
   @Override
   public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
-    return cosmosClient;
+    return cosmosClientSupplier.get();
   }
 }
