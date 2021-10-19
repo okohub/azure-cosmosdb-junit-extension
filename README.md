@@ -2,10 +2,6 @@
 
 I created this extension after introducing Azure Cosmos DB testcontainers plugin.
 
-WARNING!
-
-This project is still in WIP! After new testcontainers release, project will be in its own release cycle.
-
 See https://github.com/testcontainers/testcontainers-java/pull/4303
 
 ## Usage
@@ -16,15 +12,13 @@ You can use sync or async extensions, both will configure proper client for you.
 
 ````java
 import com.azure.cosmos.CosmosAsyncClient;
-import okohub.azure.cosmosdb.junit.CosmosData;
-import okohub.azure.cosmosdb.junit.CosmosDataExtension;
-import okohub.azure.cosmosdb.junit.CosmosDataExtensions;
+import io.github.okohub.azure.cosmosdb.junit.CosmosData;
+import io.github.okohub.azure.cosmosdb.junit.CosmosDataExtension;
+import io.github.okohub.azure.cosmosdb.junit.CosmosDataExtensions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MyAwesomeTests {
-
-  //here may be some awesome testcontainers code, you can check module tests!
+public class MyAwesomeTests /* extends AbstractCosmosDBEmulatorTest */ {
 
   @RegisterExtension
   CosmosDataExtension cosmosDataExtension = CosmosDataExtensions.withAsyncClient("endpoint", "key");
