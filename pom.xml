@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.okohub</groupId>
   <artifactId>azure-cosmosdb-junit-extension</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <name>azure-cosmosdb-junit-extension</name>
   <description>Azure CosmosDb Junit Extension</description>
   <url>https://github.com/okohub/azure-cosmosdb-junit-extension</url>
@@ -24,7 +24,7 @@
     <connection>scm:git:git@github.com:okohub/azure-cosmosdb-junit-extension.git</connection>
     <developerConnection>scm:git:git@github.com:okohub/azure-cosmosdb-junit-extension.git</developerConnection>
     <url>https://github.com/okohub/azure-cosmosdb-junit-extension</url>
-    <tag>azure-cosmosdb-junit-extension-1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
   <distributionManagement>
     <snapshotRepository>
