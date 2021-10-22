@@ -10,7 +10,7 @@ import io.github.okohub.azure.cosmosdb.junit.CosmosData;
 /**
  * @author onurozcan
  */
-public class BulkItemOperationCreator {
+public final class BulkItemOperationCreator {
 
   public static CosmosItemOperation newOperation(CosmosData annotation,
                                                  JsonNode jn,

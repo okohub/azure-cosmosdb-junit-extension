@@ -1,4 +1,4 @@
-# Azure Cosmos DB Junit(5) Extension
+# Azure Cosmos DB Junit(5) Extension  [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.okohub/azure-cosmosdb-junit-extension/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.okohub/azure-cosmosdb-junit-extension)
 
 I created this extension after introducing Azure Cosmos DB testcontainers plugin.
 

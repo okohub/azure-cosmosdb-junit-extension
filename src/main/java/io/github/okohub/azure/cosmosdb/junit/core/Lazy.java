@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 /**
  * @author onurozcan
  */
-public class Lazy<T> implements Supplier<T> {
+public final class Lazy<T> implements Supplier<T> {
 
   private final Supplier<T> delegate;
 
